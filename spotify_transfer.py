@@ -6,15 +6,17 @@ import time
 # Configuration -- fill in your Client ID and Secret from:
 # https://developer.spotify.com/dashboard
 # ---------------------------------------------------------------------------
-CLIENT_ID     = ""
-CLIENT_SECRET = ""
+CLIENT_ID     = "REDACTED_CLIENT_ID"
+CLIENT_SECRET = "REDACTED_CLIENT_SECRET"
 REDIRECT_URI  = "http://127.0.0.1:8888/callback"
 
 SCOPE = (
     "playlist-read-private "
     "playlist-read-collaborative "
     "playlist-modify-public "
-    "playlist-modify-private"
+    "playlist-modify-private "
+    "user-library-read "
+    "user-library-modify"
 )
 
 if not CLIENT_ID or not CLIENT_SECRET:
@@ -63,6 +65,15 @@ new_sp = authorise("NEW", ".cache_new")
 new_user = new_sp.current_user()
 print("Logged in as:", new_user["display_name"], "(" + new_user["id"] + ")\n")
 
+print("Fetching existing playlists on new account...")
+existing_names = set()
+results = new_sp.current_user_playlists(limit=50)
+while results:
+    for item in results["items"]:
+        existing_names.add(item["name"])
+    results = new_sp.next(results) if results["next"] else None
+print("Found", len(existing_names), "existing playlists on new account.\n")
+
 transferred = 0
 skipped = 0
 
@@ -73,6 +84,11 @@ for i, playlist in enumerate(playlists, 1):
     playlist_id = playlist["id"]
 
     print(f"[{i}/{len(playlists)}] Transferring: {name}")
+
+    if name in existing_names:
+        print("  Already exists on new account, skipping.\n")
+        skipped += 1
+        continue
 
     tracks = []
     results = old_sp.playlist_items(playlist_id, limit=100)
@@ -103,6 +119,27 @@ for i, playlist in enumerate(playlists, 1):
     print("  Done!\n")
     transferred += 1
 
+print("=== Transferring Liked Songs ===")
+# Adding already-liked tracks is idempotent - safe to re-run.
+liked = []
+results = old_sp.current_user_saved_tracks(limit=50)
+while results:
+    for item in results["items"]:
+        track = item.get("track") or item.get("item")
+        if track and track.get("id"):
+            liked.append(track["id"])
+    results = old_sp.next(results) if results["next"] else None
+
+print(str(len(liked)) + " liked songs found.")
+
+for j in range(0, len(liked), 20):
+    batch = liked[j : j + 20]
+    new_sp.current_user_saved_tracks_add(batch)
+    time.sleep(0.2)
+
+print("Liked Songs transferred.\n")
+
 print("=== Transfer complete! ===")
 print(f"Transferred {transferred} playlists, skipped {skipped} empty playlists.")
+print(f"Liked Songs: {len(liked)} tracks transferred.")
 print(f"Destination account: {new_user['display_name']}")

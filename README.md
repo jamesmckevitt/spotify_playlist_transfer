@@ -1,6 +1,6 @@
 # Spotify Playlist Transfer
 
-A simple Python script to copy all playlists you own from one Spotify account to another.
+A simple Python script to copy all playlists and Liked Songs from one Spotify account to another.
 
 ## How it works
 
@@ -9,6 +9,7 @@ The script uses [Spotipy](https://spotipy.readthedocs.io/) to authenticate two S
 1. Fetches every playlist owned by the source account.
 2. For each playlist, reads all track URIs.
 3. Creates a matching playlist on the destination account and adds the tracks in batches.
+4. Fetches all Liked Songs from the source account and saves them to the destination account.
 
 Both accounts authorise through a standard OAuth browser flow - you paste a redirect URL back into the terminal, so no passwords are ever handled by the script.
 
@@ -32,6 +33,7 @@ You only need one Spotify app - it can be created under either account and will 
 3. Fill in any name and description.
 4. Set the **Redirect URI** to exactly: `http://127.0.0.1:8888/callback`
 5. Save the app, then open its settings and note your **Client ID** and **Client Secret**.
+6. In your app settings, go to **User Management** and add the email addresses of both Spotify accounts (the one you're transferring from and the one you're transferring to). Apps are in Development Mode by default and can only authenticate accounts you've explicitly added.
 
 ## Configuration
 
