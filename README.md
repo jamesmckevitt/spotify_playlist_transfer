@@ -37,14 +37,13 @@ You only need one Spotify app - it can be created under either account and will 
 
 ## Configuration
 
-Open `spotify_transfer.py` and fill in your Client ID and Client Secret at the top of the file:
+Set your Client ID and Client Secret as environment variables before running the script:
 
-```python
-CLIENT_ID     = "your_client_id_here"
-CLIENT_SECRET = "your_client_secret_here"
+```bash
+export SPOTIFY_CLIENT_ID="your_client_id_here"
+export SPOTIFY_CLIENT_SECRET="your_client_secret_here"
+python spotify_transfer.py
 ```
-
-**Do not commit the file with your real credentials in it.**
 
 ## Usage
 

@@ -1,13 +1,10 @@
+import os
 import spotipy
 from spotipy.oauth2 import SpotifyOAuth
 import time
 
-# ---------------------------------------------------------------------------
-# Configuration -- fill in your Client ID and Secret from:
-# https://developer.spotify.com/dashboard
-# ---------------------------------------------------------------------------
-CLIENT_ID     = "REDACTED_CLIENT_ID"
-CLIENT_SECRET = "REDACTED_CLIENT_SECRET"
+CLIENT_ID     = os.environ.get("SPOTIFY_CLIENT_ID", "")
+CLIENT_SECRET = os.environ.get("SPOTIFY_CLIENT_SECRET", "")
 REDIRECT_URI  = "http://127.0.0.1:8888/callback"
 
 SCOPE = (
